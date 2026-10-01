@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { homedir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -44,6 +45,27 @@ async function lastCommit(repo, file) {
   const j = await (await api(`https://api.github.com/repos/${repo}/commits?path=${encodeURIComponent(file)}&per_page=1`)).json();
   return j[0] ? j[0].sha : null;
 }
+
+/* ---------- installed copies ---------- */
+// Every agent root that skills are deployed into. Kept in sync with the list
+// `swr doctor --skills` reports; agent-skills does not install anything itself.
+const SKILL_ROOTS = ['.agents', '.claude', '.codex', '.cursor', '.gemini', '.grok', '.cline']
+  .map((d) => path.join(homedir(), d, 'skills'));
+
+/**
+ * Read `version:` (or the legacy `metadata.version:`) from an installed skill's
+ * frontmatter. Returns null when the skill is not installed anywhere.
+ */
+function installedVersion(name) {
+  for (const root of SKILL_ROOTS) {
+    const file = path.join(root, name, 'SKILL.md');
+    if (!existsSync(file)) continue;
+    const m = readFileSync(file, 'utf8').match(/^\s*(?:metadata:\s*\n\s+)?version:\s*(\S+)/m);
+    if (m) return m[1];
+  }
+  return null;
+}
+
 /* A file upstream deleted still has a newest commit — the one that removed it,
  * where fetching the path is a 404. Walk back to the last revision that exists,
  * and separately ask whether the path is still there on the default branch. */
@@ -108,15 +130,25 @@ async function check() {
     } else {
       const sameText = sha(bodyOf(cur.text)) === sha(pinned);
       if (gone) {
+        // Upstream cut the file at `cur.sha`; our pin is intentionally older. We
+        // stay on the pinned text, so the only real question is whether our copy
+        // still equals that pin (`same`) — a difference from `cur` is expected
+        // and is not actionable.
+        note = same
+          ? `upstream deleted the file; cut at ${cur.sha}, we stay on the pinned ${sk.pinned}`
+          : `upstream deleted the file; our body differs from the pinned text — re-check it against ${sk.pinned}`;
+      } else if (sk.hold) {
+        // Deliberate pin: upstream moved and we chose to stay, so report
+        // movement as an intentional hold rather than as outstanding work.
         note = sameText
-          ? `upstream deleted the file (last revision ${cur.sha}) — pinned text is final and matches it`
-          : `upstream deleted the file; last revision ${cur.sha} differs from our pinned ${sk.pinned}`;
+          ? `current ${cur.sha} (same text as pinned)`
+          : `holding pinned ${sk.pinned} by choice; upstream is at ${cur.sha}`;
       } else {
         note = sameText
           ? `current ${cur.sha} (same text as pinned)`
           : `UPDATE AVAILABLE: ${cur.sha} differs from pinned ${sk.pinned} — node scripts/upstream.mjs update ${sk.name}`;
       }
-      if (!sameText) bad++;
+      if (!sameText && !gone && !sk.hold) bad++;
     }
     console.log(`${same ? 'match  ' : 'DIFFERS'}  ${sk.name.padEnd(22)} pinned ${sk.pinned}  ${note}`);
     if (!same) console.log(`         our body differs from the pinned upstream text — run: node scripts/upstream.mjs update ${sk.name}`);
@@ -127,9 +159,12 @@ async function check() {
   }
   for (const sk of manifest.skills.filter((s) => s.mode === 'external')) {
     const want = (await (await fetch(sk.latestCheck.url)).json())[sk.latestCheck.field];
-    const stale = want !== sk.pinnedVersion;
+    // Report what is actually deployed, not the manifest's last-known pin: the
+    // pin is only a fallback for machines where the skill is not installed.
+    const have = installedVersion(sk.name) ?? sk.pinnedVersion;
+    const stale = want !== have;
     if (stale) bad++;
-    console.log(`external ${sk.name.padEnd(22)} installed ${sk.pinnedVersion}  latest ${want}${stale ? `  → run: ${sk.installer}` : '  (up to date)'}`);
+    console.log(`external ${sk.name.padEnd(22)} installed ${have}  latest ${want}${stale ? `  → run: ${sk.installer}` : '  (up to date)'}`);
   }
   console.log(bad ? `\n${bad} item(s) need attention` : '\neverything in sync');
   process.exit(bad ? 1 : 0);

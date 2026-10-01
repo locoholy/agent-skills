@@ -11,7 +11,7 @@
       "license": "MIT",
       "copyright": "Copyright (c) 2025 TJ Boudreaux",
       "pinned": "a31e22d",
-      "note": "Catalog cut the skill at 733353c (2026-07-16); the text we run is the last upstream revision, a31e22d."
+      "note": "Catalog cut the skill at 733353c (2026-07-16); the body was last revised at e0bb0d9. We stay on the a31e22d text, so `check` treats remaining on the pin as correct and never suggests an update."
     },
     {
       "name": "second-order-thinking",
@@ -23,7 +23,8 @@
       "license": "MIT",
       "copyright": "Copyright (c) 2025 TJ Boudreaux",
       "pinned": "a31e22d",
-      "note": "Upstream rewrote it at c2e4a73 (2026-07-16) as a lean agent contract; our pinned revision is the one in use."
+      "hold": true,
+      "note": "Upstream rewrote it at c2e4a73 (2026-07-16) as a lean agent contract. We tested that rewrite and chose to stay on the a31e22d text, so `hold` keeps `check` from flagging it as outstanding work."
     },
     {
       "name": "smart-web-read",
