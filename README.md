@@ -30,6 +30,6 @@ npx skills update -g
 
 ## Editing
 
-`skills/<name>/SKILL.md` is the source of truth. Edit here, bump `metadata.version`, commit, then run `npx skills update -g` to pull it into the agent directories.
+`skills/<name>/SKILL.md` is the source of truth. The global install `~/.agents/skills/<name>` is a symlink back into this repository, and every agent directory (`~/.claude/skills`, `~/.codex/skills`, `~/.grok/skills`, `~/.gemini/skills`, …) is a symlink to that, so editing here takes effect immediately in every agent without reinstalling.
 
 Versioning is deliberately minimal: the version lives in the skill's own frontmatter, and each release is a git tag, so `git log`/`git diff` show what changed between releases.
