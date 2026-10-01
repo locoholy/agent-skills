@@ -1,9 +1,13 @@
 ---
 name: occams-razor
 description: "Prefers the explanation with the fewest assumptions. Use on any debugging, error analysis, log triage, or 'why is this broken/slow/stupid' question: enumerate competing hypotheses, count required assumptions, verify the cheapest first. Triggers: упало, тупит, почему, 401/500/timeout, странная ошибка, логи."
-license: Unspecified
+license: MIT — Copyright (c) 2025 TJ Boudreaux
 metadata:
   version: "1.0.0"
+  upstream:
+    repo: tjboudreaux/cc-thinking-skills
+    path: skills/thinking-occams-razor/SKILL.md
+    commit: a31e22d
 ---
 # Occam's Razor (Parsimony Principle)
 

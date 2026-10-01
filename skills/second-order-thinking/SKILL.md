@@ -1,9 +1,13 @@
 ---
 name: second-order-thinking
 description: "Before any 'let's add/rewrite/split/cache/abstract' request, runs the 'and then what?' chain aloud so downstream costs are visible before commit. Triggers: давай добавим, перепишем, разобьём на сервисы, добавим кэш, вынесем в абстракцию, новая зависимость."
-license: Unspecified
+license: MIT — Copyright (c) 2025 TJ Boudreaux
 metadata:
   version: "1.0.0"
+  upstream:
+    repo: tjboudreaux/cc-thinking-skills
+    path: skills/thinking-second-order/SKILL.md
+    commit: a31e22d
 ---
 # Second-Order Thinking
 

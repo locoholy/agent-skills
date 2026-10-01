@@ -1,0 +1,46 @@
+{
+  "$comment": "Every skill in use that this repo does not own. `check` verifies our copies still match the pinned upstream text and whether upstream has moved; `update <name>` pulls the current upstream body in. Run: node scripts/upstream.mjs check",
+  "skills": [
+    {
+      "name": "occams-razor",
+      "mode": "vendored",
+      "repo": "tjboudreaux/cc-thinking-skills",
+      "path": "skills/thinking-occams-razor/SKILL.md",
+      "upstreamName": "thinking-occams-razor",
+      "file": "skills/occams-razor/SKILL.md",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2025 TJ Boudreaux",
+      "pinned": "a31e22d",
+      "note": "Catalog cut the skill at 733353c (2026-07-16); the text we run is the last upstream revision, a31e22d."
+    },
+    {
+      "name": "second-order-thinking",
+      "mode": "vendored",
+      "repo": "tjboudreaux/cc-thinking-skills",
+      "path": "skills/thinking-second-order/SKILL.md",
+      "upstreamName": "thinking-second-order",
+      "file": "skills/second-order-thinking/SKILL.md",
+      "license": "MIT",
+      "copyright": "Copyright (c) 2025 TJ Boudreaux",
+      "pinned": "a31e22d",
+      "note": "Upstream rewrote it at c2e4a73 (2026-07-16) as a lean agent contract; our pinned revision is the one in use."
+    },
+    {
+      "name": "smart-web-read",
+      "mode": "linked",
+      "repo": "locoholy/smart-web-kit",
+      "path": "skills/smart-web-read/SKILL.md",
+      "install": "npx skills add locoholy/smart-web-kit -g",
+      "note": "Own repository. Ships with the `swr` binary, which is the point of the kit: install.sh compiles the binary with this skill text embedded, then `swr init` deploys it into every agent root with a `version:` stamp."
+    },
+    {
+      "name": "impeccable",
+      "mode": "external",
+      "home": "https://impeccable.style",
+      "installer": "npx impeccable update",
+      "pinnedVersion": "4.1.1",
+      "latestCheck": { "url": "https://impeccable.style/api/version", "field": "skills" },
+      "note": "Third-party (pbakaus), not vendored here: it has its own updater and its own version check cached at ~/.impeccable/update-check.json. The npm package `impeccable` is CLI-only and lags the site payload."
+    }
+  ]
+}
